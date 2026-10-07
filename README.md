@@ -1,84 +1,161 @@
 # PocketSmart AI — Your Smart Budget & Recommendation Assistant
 
-A complete FastAPI + Jinja2 + Gemini application based on the supplied project documentation.
-
-## Important model note
-The original document specifies Gemini 1.5 Flash Pro. Gemini 1.5 Flash was shut down by Google on September 29, 2025, so this implementation keeps the same Gemini-powered architecture but defaults to a currently available model through `GEMINI_MODEL`. Change that value if your Google AI account has access to another current model.
+A complete FastAPI + Jinja2 + Gemini application for smart budget planning and recommendations.
 
 ## Features
+
 - Registration, login, JWT authentication and logout
-- Session info and session data endpoints
-- Home Interior planner
-- Party Budget planner
-- Jewelry planner with optional outfit image upload
-- Gemini text + image integration
-- Deterministic fallback recommendations when no Gemini API key is configured or the AI call fails
-- Mock cross-platform product/service catalog for Amazon, Flipkart, IKEA, Swiggy, Zomato and OYO-style links
+- Session information and session data
+- Home Interior Budget Planner
+- Party Budget Planner
+- Jewelry Budget Planner
+- Optional outfit image upload for jewelry planning
+- Gemini AI integration
+- Fallback recommendations when Gemini is unavailable
+- Mock product/service catalog
 - Recommendation history
 - Responsive Jinja2 frontend
-- API documentation at `/docs`
+- FastAPI REST APIs
+- Interactive API documentation
 - Automated API tests
 
 ## Python 3.15
-The project is written for Python 3.15 syntax/runtime. Current FastAPI and Pydantic releases are actively evolving around Python 3.15, while some third-party packages may lag. If `pip` reports that a dependency has no compatible wheel on your machine, use the newest available release of that dependency rather than downgrading the application code.
 
-## Quick start on Windows PowerShell
-```powershell
-cd "C:\path\to\PocketSmart-AI-Complete"
-py -3.15 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
-Copy-Item .env.example .env
-```
+This project is designed to run with Python 3.15.
 
-Open `.env` and add your Gemini API key. The app still runs in fallback/demo mode without a key.
+## Project Structure
 
-Run:
-```powershell
-python run.py
-```
-Then open http://127.0.0.1:8000
-
-## API test
-In another terminal:
-```powershell
-.\.venv\Scripts\Activate.ps1
-pytest -q
-```
-
-## Main API routes
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-- `GET /api/auth/session-info`
-- `GET /api/auth/session-data`
-- `POST /api/planners/generate-home`
-- `POST /api/planners/generate-party`
-- `POST /api/planners/generate-jewelry`
-- `GET /api/history`
-- `GET /api/history/{id}`
-- `DELETE /api/history/{id}`
-- `GET /api/health`
-
-## Architecture
 ```text
-Browser/Jinja2/JS
-       |
-       v
-FastAPI routers
-       |
-       +--> Auth / JWT / SQLite
-       |
-       +--> Planner validation
-       |
-       +--> Gemini service ----> Gemini API
-       |          |
-       |          +------------> JSON recommendations
-       |
-       +--> Mock catalog fallback
-       |
-       +--> History service ----> SQLite
-```
+PocketSmart-AI-Complete/
+│
+├── app/
+│   ├── main.py
+│   ├── config.py
+│   ├── db.py
+│   ├── security.py
+│   ├── dependencies.py
+│   │
+│   ├── models/
+│   │   └── schemas.py
+│   │
+│   ├── routers/
+│   │   ├── auth.py
+│   │   ├── planners.py
+│   │   └── history.py
+│   │
+│   ├── services/
+│   │   ├── catalog.py
+│   │   ├── gemini_utils.py
+│   │   └── history.py
+│   │
+│   ├── templates/
+│   │   ├── index.html
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   ├── dashboard.html
+│   │   ├── home_planner.html
+│   │   ├── party_planner.html
+│   │   ├── jewelry_planner.html
+│   │   ├── recommendations.html
+│   │   ├── history.html
+│   │   └── testimonials.html
+│   │
+│   └── static/
+│       ├── css/
+│       │   └── style.css
+│       └── js/
+│           └── app.js
+│
+├── tests/
+│   └── test_api.py
+│
+├── data/
+├── uploads/
+├── .env.example
+├── .gitignore
+├── .python-version
+├── pyproject.toml
+├── requirements.txt
+├── run.py
+├── setup.ps1
+└── README.md# PocketSmart AI — Your Smart Budget & Recommendation Assistant
 
-The platform catalog is deliberately mocked, matching the source document's instruction to use mock API calls/simulated sourcing rather than claiming live marketplace APIs.
+A complete FastAPI + Jinja2 + Gemini application for smart budget planning and recommendations.
+
+## Features
+
+- Registration, login, JWT authentication and logout
+- Session information and session data
+- Home Interior Budget Planner
+- Party Budget Planner
+- Jewelry Budget Planner
+- Optional outfit image upload for jewelry planning
+- Gemini AI integration
+- Fallback recommendations when Gemini is unavailable
+- Mock product/service catalog
+- Recommendation history
+- Responsive Jinja2 frontend
+- FastAPI REST APIs
+- Interactive API documentation
+- Automated API tests
+
+## Python 3.15
+
+This project is designed to run with Python 3.15.
+
+## Project Structure
+
+```text
+PocketSmart-AI-Complete/
+│
+├── app/
+│   ├── main.py
+│   ├── config.py
+│   ├── db.py
+│   ├── security.py
+│   ├── dependencies.py
+│   │
+│   ├── models/
+│   │   └── schemas.py
+│   │
+│   ├── routers/
+│   │   ├── auth.py
+│   │   ├── planners.py
+│   │   └── history.py
+│   │
+│   ├── services/
+│   │   ├── catalog.py
+│   │   ├── gemini_utils.py
+│   │   └── history.py
+│   │
+│   ├── templates/
+│   │   ├── index.html
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   ├── dashboard.html
+│   │   ├── home_planner.html
+│   │   ├── party_planner.html
+│   │   ├── jewelry_planner.html
+│   │   ├── recommendations.html
+│   │   ├── history.html
+│   │   └── testimonials.html
+│   │
+│   └── static/
+│       ├── css/
+│       │   └── style.css
+│       └── js/
+│           └── app.js
+│
+├── tests/
+│   └── test_api.py
+│
+├── data/
+├── uploads/
+├── .env.example
+├── .gitignore
+├── .python-version
+├── pyproject.toml
+├── requirements.txt
+├── run.py
+├── setup.ps1
+└── README.md
