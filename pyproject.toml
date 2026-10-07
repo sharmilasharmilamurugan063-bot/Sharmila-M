@@ -1,0 +1,8 @@
+[project]
+name = "pocketsmart-ai"
+version = "1.0.0"
+description = "PocketSmart AI budget and recommendation assistant"
+requires-python = ">=3.15,<3.16"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

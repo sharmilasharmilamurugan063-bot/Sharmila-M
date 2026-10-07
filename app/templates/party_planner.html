@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="page-head">
+    <p class="eyebrow">SCENARIO 2</p>
+    <h1>Party Budget Planner</h1>
+    <p>Balance food, venue, decoration and entertainment.</p>
+</section>
+
+<form class="card form" id="plannerForm">
+
+    <div class="grid two">
+
+        <label>
+            Total Budget (₹)
+            <input
+                type="number"
+                name="budget"
+                placeholder="Enter your budget"
+                required
+            >
+        </label>
+
+        <label>
+            Number of Guests
+            <input
+                type="number"
+                name="guests"
+                placeholder="Enter number of guests"
+                required
+            >
+        </label>
+
+    </div>
+
+
+    <div class="grid two">
+
+        <label>
+            Event Type
+
+            <select name="event_type">
+                <option value="birthday">Birthday</option>
+                <option value="corporate">Corporate</option>
+                <option value="wedding">Wedding</option>
+                <option value="engagement">Engagement</option>
+                <option value="other">Other</option>
+            </select>
+        </label>
+
+        <label>
+            Venue Preference
+            <input
+                type="text"
+                name="venue"
+                placeholder="Indoor, outdoor, hotel, hall..."
+            >
+        </label>
+
+    </div>
+
+
+    <label>
+        City / Area
+
+        <input
+            type="text"
+            name="city"
+            placeholder="Example: Chennai"
+        >
+    </label>
+
+
+    <label>
+        Notes
+
+        <textarea
+            name="notes"
+            placeholder="Food preference, theme, timing, decoration requirements..."
+        ></textarea>
+    </label>
+
+
+    <button
+        class="btn primary"
+        type="submit"
+        id="generateBtn"
+    >
+        Generate Party Plan
+    </button>
+
+
+    <p
+        id="formMsg"
+        class="msg"
+        aria-live="polite"
+    ></p>
+
+</form>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+const plannerForm = document.getElementById("plannerForm");
+const formMsg = document.getElementById("formMsg");
+const generateBtn = document.getElementById("generateBtn");
+
+plannerForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const formData = new FormData(plannerForm);
+
+    const budget = Number(formData.get("budget"));
+    const guests = Number(formData.get("guests"));
+
+    /*
+     * Basic validation
+     */
+
+    if (!Number.isFinite(budget)) {
+        formMsg.textContent = "Please enter a valid budget.";
+        return;
+    }
+
+    if (!Number.isFinite(guests)) {
+        formMsg.textContent = "Please enter a valid number of guests.";
+        return;
+    }
+
+
+    /*
+     * Create request data
+     */
+
+    const payload = {
+        budget: budget,
+        guests: guests,
+        event_type: formData.get("event_type"),
+        venue: formData.get("venue") || "",
+        city: formData.get("city") || "",
+        notes: formData.get("notes") || ""
+    };
+
+
+    /*
+     * Show loading message
+     */
+
+    formMsg.textContent = "Generating your party plan...";
+    generateBtn.disabled = true;
+    generateBtn.textContent = "Generating...";
+
+
+    try {
+
+        const response = await api(
+            "/api/planners/generate-party",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(payload)
+            }
+        );
+
+
+        /*
+         * Successful response
+         */
+
+        if (response.ok) {
+
+            localStorage.setItem(
+                "lastRecommendation",
+                JSON.stringify(response.data)
+            );
+
+            window.location.href = "/recommendations";
+
+            return;
+        }
+
+
+        /*
+         * Server returned an error
+         */
+
+        let errorMessage = "Could not generate party plan.";
+
+        if (response.data) {
+
+            if (typeof response.data.detail === "string") {
+                errorMessage = response.data.detail;
+            }
+
+            else if (response.data.message) {
+                errorMessage = response.data.message;
+            }
+        }
+
+        formMsg.textContent = errorMessage;
+
+    }
+
+
+    /*
+     * Network / JavaScript error
+     */
+
+    catch (error) {
+
+        console.error("Party planner error:", error);
+
+        formMsg.textContent =
+            "Unable to connect to the server. Please make sure PocketSmart AI is running.";
+
+    }
+
+
+    finally {
+
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Generate Party Plan";
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

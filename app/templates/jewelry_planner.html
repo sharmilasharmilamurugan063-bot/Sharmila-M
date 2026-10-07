@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="page-head">
+    <p class="eyebrow">SCENARIO 3</p>
+
+    <h1>Jewelry Budget Planner</h1>
+
+    <p>
+        Get occasion- and style-aware suggestions, with an optional outfit image.
+    </p>
+</section>
+
+
+<form
+    class="card form"
+    id="plannerForm"
+    enctype="multipart/form-data"
+>
+
+    <div class="grid two">
+
+        <label>
+            Budget (₹)
+            <input
+                name="budget"
+                type="number"
+                required
+            >
+        </label>
+
+
+        <label>
+            Occasion
+            <input
+                name="occasion"
+                placeholder="Wedding, party, college event..."
+                required
+            >
+        </label>
+
+    </div>
+
+
+    <div class="grid two">
+
+        <label>
+            Style
+
+            <select name="style">
+                <option value="classic">Classic</option>
+                <option value="minimal">Minimal</option>
+                <option value="traditional">Traditional</option>
+                <option value="modern">Modern</option>
+                <option value="statement">Statement</option>
+            </select>
+        </label>
+
+
+        <label>
+            Outfit color
+
+            <input
+                name="outfit_color"
+                placeholder="Optional"
+            >
+        </label>
+
+    </div>
+
+
+    <label>
+        Outfit image
+
+        <span class="hint">
+            Optional · JPG/PNG/WEBP · max 5 MB
+        </span>
+
+        <input
+            name="outfit_image"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+        >
+    </label>
+
+
+    <label>
+        Notes
+
+        <textarea
+            name="notes"
+            placeholder="Metal preference, matching colors, etc."
+        ></textarea>
+    </label>
+
+
+    <button
+        class="btn primary"
+        type="submit"
+    >
+        Generate Jewelry Plan
+    </button>
+
+
+    <p
+        id="formMsg"
+        class="msg"
+    ></p>
+
+</form>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document
+    .getElementById('plannerForm')
+    .addEventListener('submit', async e => {
+
+        e.preventDefault();
+
+        const form = e.target;
+
+        const message = document.getElementById('formMsg');
+
+        message.textContent = 'Generating your jewelry plan...';
+
+        try {
+
+            const r = await api(
+                '/api/planners/generate-jewelry',
+                {
+                    method: 'POST',
+                    body: new FormData(form)
+                }
+            );
+
+
+            if (r.ok) {
+
+                localStorage.setItem(
+                    'lastRecommendation',
+                    JSON.stringify(r.data)
+                );
+
+                location.href = '/recommendations';
+
+            } else {
+
+                message.textContent =
+                    r.data?.detail ||
+                    'Could not generate plan';
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+                'Something went wrong. Please try again.';
+
+        }
+
+    });
+
+</script>
+
+{% endblock %}

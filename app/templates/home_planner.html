@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="page-head">
+    <p class="eyebrow">SCENARIO 1</p>
+
+    <h1>Home Interior Planner</h1>
+
+    <p>
+        Allocate a home décor budget across rooms and essentials.
+    </p>
+</section>
+
+
+<form class="card form" id="plannerForm">
+
+    <div class="grid two">
+
+        <label>
+            Total budget (₹)
+
+            <input
+                name="budget"
+                type="number"
+                required
+            >
+        </label>
+
+
+        <label>
+            Style
+
+            <input
+                name="style"
+                value="modern"
+            >
+        </label>
+
+    </div>
+
+
+    <label>
+        Rooms
+
+        <span class="hint">
+            Hold Ctrl to select more than one
+        </span>
+
+        <select
+            name="rooms"
+            multiple
+            required
+        >
+            <option>Living Room</option>
+            <option>Kitchen</option>
+            <option>Bedroom</option>
+            <option>Dining Room</option>
+            <option>Balcony</option>
+        </select>
+    </label>
+
+
+    <div class="grid three">
+
+        <label>
+            Lights
+
+            <input
+                name="lights"
+                type="number"
+                min="0"
+                value="2"
+            >
+        </label>
+
+
+        <label>
+            Fans
+
+            <input
+                name="fans"
+                type="number"
+                min="0"
+                value="1"
+            >
+        </label>
+
+
+        <label>
+            Dining tables
+
+            <input
+                name="dining_tables"
+                type="number"
+                min="0"
+                value="1"
+            >
+        </label>
+
+    </div>
+
+
+    <label>
+        Notes
+
+        <textarea
+            name="notes"
+            placeholder="Preferred colors, room size, priorities..."
+        ></textarea>
+    </label>
+
+
+    <button
+        class="btn primary"
+        type="submit"
+    >
+        Generate Home Plan
+    </button>
+
+
+    <p
+        id="formMsg"
+        class="msg"
+    ></p>
+
+</form>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document
+    .getElementById('plannerForm')
+    .addEventListener('submit', async e => {
+
+        e.preventDefault();
+
+        const f = new FormData(e.target);
+
+        const message = document.getElementById('formMsg');
+
+        message.textContent = 'Generating your home plan...';
+
+        const payload = {
+            budget: Number(f.get('budget')),
+            rooms: f.getAll('rooms'),
+            lights: Number(f.get('lights')),
+            fans: Number(f.get('fans')),
+            dining_tables: Number(f.get('dining_tables')),
+            style: f.get('style'),
+            notes: f.get('notes')
+        };
+
+        try {
+
+            const r = await api(
+                '/api/planners/generate-home',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+
+            if (r.ok) {
+
+                localStorage.setItem(
+                    'lastRecommendation',
+                    JSON.stringify(r.data)
+                );
+
+                location.href = '/recommendations';
+
+            } else {
+
+                message.textContent =
+                    r.data?.detail ||
+                    'Could not generate plan';
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+                'Something went wrong. Please try again.';
+
+        }
+
+    });
+
+</script>
+
+{% endblock %}
